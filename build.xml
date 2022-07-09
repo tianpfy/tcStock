@@ -1,0 +1,55 @@
+<project name="tcat" basedir="." default="main">
+
+    <property name="src.dir"     value="src"/>
+    <property name = "dist.dir"  value = "dist"/>
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="main-class"  value="tcStock"/>
+    <property name = "classpath"  value="${build.dir}/classes"/>
+    <property name="lib.dir"  value="lib"/>
+<tstamp>
+  <format property="TODAY"
+          pattern="d-MMMM-yyyy"
+          locale="en,AUS"/>
+</tstamp>
+
+<path id = "classpath">
+<fileset dir = "${lib.dir}" includes = "**/*.jar"/> </path>
+
+
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref = "classpath" includeantruntime = "false"/>
+<copy todir="${classes.dir}">
+<fileset dir = "${src.dir}" excludes = "**/*.java"/>
+</copy>
+    </target>
+
+    <target name="jar" depends="compile">
+    <mkdir dir="${dist.dir}"/>  
+        <jar destfile="${dist.dir}/tcStock.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="${main-class}"/>
+<attribute name= "Class-Path" value = "lib/annotations-api.jar lib/ecj-4.6.3.jar lib/tomcat-dbcp.jar lib/tomcat-embed-core.jar lib/tomcat-embed-el.jar lib/tomcat-embed-jasper.jar lib/tomcat-embed-logging-juli.jar  lib/tomcat-embed-logging-log4j.jar lib/tomcat-embed-websocket.jar"/>
+     <attribute name = "Author" value = "Jim Monaghan"/>
+<attribute name = "Built-on" value ="${TODAY}"/>          
+</manifest>
+        </jar></target>
+
+    <target name="run" depends="jar">
+ <java fork = "true" classname = "tcStock">
+<classpath> <path refid ="classpath"/>
+        <path location ="dist/tcStock.jar"/>
+</classpath>
+</java>
+    </target>
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,run"/>
+
+</project>
